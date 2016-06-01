@@ -40,6 +40,8 @@ public class DbAccess {
             
         } catch (SQLException | JSONException ex) {
             ErrorLogger.log(ex.toString());
+        } finally{
+            db.close();
         }
         
         return json;
@@ -47,6 +49,23 @@ public class DbAccess {
     private static String getFullAttemptSummary(){
         String sql = "SELECT * FROM nhl.attemptlocationview";
         return sql;
+    }
+    
+    public static JSONArray getAttemptSummaryJSONForPlayer(String firstName, String lastName, String team){
+        DbUtilities db = new DbUtilities();
+        JSONArray json = null;
+        try {
+            json = db.getJsonDataTable(getAttemptSummaryByPlayer(firstName, lastName, team));
+        } catch (SQLException ex) {
+            ErrorLogger.log(ex.toString());
+        } catch (JSONException ex) {
+            ErrorLogger.log(ex.toString());
+        }
+        return json;
+    }
+    
+    private static String getAttemptSummaryByPlayer(String firstName, String lastName, String team){
+        return "SELECT eventtype, shottype, x, y FROM nhl.attemptlocationview WHERE firstname = '" + firstName + "' AND lastname = '" + lastName + "' AND teamname = '" + team + "';";
     }
     
     
