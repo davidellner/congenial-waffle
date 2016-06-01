@@ -44,9 +44,16 @@ public class AttemptSummaryWS extends HttpServlet {
         
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-           
-           
-           JSONArray attempts = DbAccess.getFullAttemptJSON();
+           String firstName = request.getParameter("firstName");
+           String lastName = request.getParameter("lastName");
+           String team = request.getParameter("team");
+           JSONArray attempts = null;
+           if(firstName == null || lastName == null || team  == null){
+               //what do?
+               attempts = DbAccess.getFullAttemptJSON();
+           } else {
+               attempts = DbAccess.getAttemptSummaryJSONForPlayer(firstName, lastName, team);
+           }
            
            StringWriter sw = new StringWriter();
            attempts.write(sw);
