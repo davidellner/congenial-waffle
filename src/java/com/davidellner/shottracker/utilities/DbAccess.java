@@ -60,12 +60,39 @@ public class DbAccess {
             ErrorLogger.log(ex.toString());
         } catch (JSONException ex) {
             ErrorLogger.log(ex.toString());
+        } finally{
+            db.close();
         }
         return json;
     }
     
     private static String getAttemptSummaryByPlayer(String firstName, String lastName, String team){
-        return "SELECT eventtype, shottype, x, y FROM nhl.attemptlocationview WHERE firstname = '" + firstName + "' AND lastname = '" + lastName + "' AND teamname = '" + team + "';";
+        return "SELECT eventtype, shottype, x, y FROM nhl.attemptlocationview WHERE firstname = '" + firstName + "' AND lastname = '" + lastName + "' AND teamname = '" + team + "'";
+    }
+    
+    public static ResultSet getAttemptSummaryResultSetByPlayerAndLocation(String firstName, String lastName, String team, int minx, int miny, int maxx, int maxy){
+    
+        DbUtilities db = new DbUtilities();
+        ResultSet rs = null;
+        try{
+            rs = db.getResultSet(getAttemptSummaryByPlayerAndLocation(firstName, lastName, team, minx, miny, maxx, maxy));
+            
+        } catch (SQLException ex) {
+           ErrorLogger.log(ex.getMessage());
+        } finally {
+            //db.close();
+        }
+      return rs;
+    }
+    
+    
+    private static String getAttemptSummaryByPlayerAndLocation(
+            String firstName, String lastName, String team, int minx, int miny, int maxx, int maxy){
+        return getAttemptSummaryByPlayer(firstName, lastName, team) 
+                + " AND x >= " + minx
+                + " AND y >= " + miny
+                + " AND x <= " + maxx
+                + " AND y <= " + maxy;
     }
     
     
