@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+	 <style type="text/css">
+
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        font-size: 11px;
+      }
+
+      .axis path, .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;  /* Round any decimal pixels so it'll render nicely */
+      }
+
+      /*
+      //Can use CSS3 Transitions, but not for everything (e.g. change radius size)
+      circle:hover{
+        fill: green;
+      }
+      */
+
+    </style>
+</head>
+<body>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script>
+
+d3.xml("field.svg", "image/svg+xml", function(error, xml) {
+  if (error) throw error;
+  document.body.appendChild(xml.documentElement);
+
+      var w = window.innerWidth,
+          h = window.innerHeight,
+          margin = { top: 40, right: 20, bottom: 20, left: 40 },
+          radius = 6;
+
+var base = d3.select("svg");
+      var svg = d3.select("svg").append("g");
+
+      var dataset = [
+        
+      ];
+
+      /*
+
+      // We're passing in a function in d3.max to tell it what we're maxing (x value)
+      var xScale = d3.scale.linear()
+          .domain([0, d3.max(dataset, function (d) { return d.x + 10; })])
+          .range([margin.left, w - margin.right]);  // Set margins for x specific
+
+      // We're passing in a function in d3.max to tell it what we're maxing (y value)
+      var yScale = d3.scale.linear()
+          .domain([0, d3.max(dataset, function (d) { return d.y + 10; })])
+          .range([margin.top, h - margin.bottom]);  // Set margins for y specific
+
+
+      // Add a X and Y Axis (Note: orient means the direction that ticks go, not position)
+      var xAxis = d3.svg.axis().scale(xScale).orient("top");
+      var yAxis = d3.svg.axis().scale(yScale).orient("left");
+      */
+      var oldCoordinates = [0,0];
+      var firstCoordinates = [-1,-1];
+      var path = [];
+      var circleAttrs = {
+          cx: function(d) { return d.x; },
+          cy: function(d) { return d.y; },
+          r: radius
+      };
+
+
+      // Adds X-Axis as a 'g' element
+      
+
+      svg.selectAll("circle")
+          .data(dataset)
+          .enter()
+          .append("circle")
+          .attr(circleAttrs)  // Get attributes from circleAttrs var
+          .on("mouseover", handleMouseOver)
+          .on("mouseout", handleMouseOut);
+
+      // On Click, we want to add data to the array and chart
+      base.on("click", function() {
+          var coords = d3.mouse(this);
+
+          // Normally we go from data to pixels, but here we're doing pixels to data
+          var newData= {
+            x: Math.round( coords[0]),  // Takes the pixel number to convert to number
+            y: Math.round( coords[1])
+          };
+          dataset.push(newData);   // Push data to our array
+
+          svg.selectAll("circle")  // For new circle, go through the update process
+            .data(dataset)
+            .enter()
+            .append("circle")
+            .attr(circleAttrs)  // Get attributes from circleAttrs var
+            .on("mouseover", handleMouseOver)
+            .on("mouseout", handleMouseOut);
+
+            if(oldCoordinates[0] == 0 && oldCoordinates[1] == 0){
+
+                firstCoordinates = [coords[0], coords[1]];
+                oldCoordinates = [coords[0], coords[1]];
+
+                path.push(firstCoordinates);
+
+            } else{
+
+              var xdist = firstCoordinates[0] - coords[0];
+              var ydist = firstCoordinates[1] - coords[1];
+              if((Math.abs(xdist) < 11) && (Math.abs(ydist) < 11)){
+
+                  svg.append("path")
+                      .attr("stroke", "blue")
+                      .attr("stroke-width", 2)
+                      .attr("fill", "none")
+                      .attr("d", "M " + firstCoordinates[0] + " "+ firstCoordinates[1] + " L " + oldCoordinates[0] + " " + oldCoordinates[1] +"z");
+
+                  oldCoordinates = [0,0];
+                  firstCoordinates = [-1, -1];
+                  svg.selectAll("#temp").remove();
+                      
+
+                      svg.append("path")
+                      .attr("stroke", "red")
+                      .attr("id", "tmp")
+                      .attr("stroke-width", 2)
+                      .attr("fill", "red")
+                      .attr("fill-opacity", ".08")
+                      .attr("d", createPath(path));
+
+                       svg.selectAll("circle").remove(); 
+                       svg.selectAll("text").remove();
+                       
+                       path = [];
+
+
+              } else{
+
+                    svg.append("path")
+                      .attr("stroke", "blue")
+                      .attr("stroke-width", 2)
+                      .attr("fill", "none")
+                      .attr("d", "M " + coords[0] + " "+ coords[1] + " L " + oldCoordinates[0] + " " + oldCoordinates[1] +"z");
+                      oldCoordinates = [coords[0], coords[1]];
+                      path.push(oldCoordinates);
+                      
+                      
+
+
+                      
+
+                }
+              }
+               
+              
+              }
+        )
+      
+      function createPath(dat){
+
+          var moveto = dat[0];
+
+          var linestr= "M " + moveto[0] + ", " + moveto[1];
+          for(var i = 1; i < dat.length; i++){
+
+              linestr = linestr + " L "+ dat[i][0] + ", " + dat[i][1];
+
+          }
+
+          linestr = linestr + " L " + moveto[0] + ", " + moveto[1] + " z";
+
+          return linestr;
+
+      }
+      // Create Event Handlers for mouse
+      function handleMouseOver(d, i) {  // Add interactivity
+
+            // Use D3 to select element, change color and size
+            d3.select(this).attr({
+              fill: "orange",
+              r: radius * 2
+            });
+
+            // Specify where to put label of text
+            svg.append("text").attr({
+               id: "t" + d.x + "-" + d.y,  // Create an id for text so we can select it later for removing on mouseout
+                x: function() { return d.x - 30; },
+                y: function() { return d.y - 15; }
+            })
+            .text(function() {
+              return [d.x, d.y];  // Value of the text
+            });
+          }
+
+      function handleMouseOut(d, i) {
+            // Use D3 to select element, change color back to normal
+            d3.select(this).attr({
+              fill: "black",
+              r: radius
+            });
+
+            // Select text by id and then remove
+            d3.select("#t" + d.x + "-" + d.y).remove();  // Remove text location
+          }
+
+  
+});
+
+</script>

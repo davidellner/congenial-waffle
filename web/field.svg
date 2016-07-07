@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="1000px" height="850px" viewBox="0 0 1000 850" stroke="gray" version="1.1"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  
+	 
+     <rect x="0" y="0" width="2000" height="850" fill="white" fill-opacity=".01" />
+     <path d="M 0,0 L 0,850 1000,850 1000,0 0,0 z" stroke="black" stroke-width=".5" stroke-opacity="0.01" fill="blue" fill-opacity=".05" />
+
+     <!-- blue line -->
+     <path d="M 250,0 L 250,850 z" stroke="blue" stroke-width="7" stroke-opacity="0.15"/>
+
+     <!-- goal red line -->
+     <path d="M 890,0 L 890,850 z" stroke="red" stroke-width="3" stroke-opacity="0.15"/>
+
+     <!-- trapezoid -->
+     <path d="M 890, 515 L 1000, 565 z" stroke="red" stroke-width="3" stroke-opacity="0.15"/>
+     <path d="M 890, 335 L 1000, 285 z" stroke="red" stroke-width="3" stroke-opacity="0.15"/>
+
+
+     <circle cx="680" cy="220" r="4" stroke="red" fill="red" stroke-opacity="0.2" fill-opacity="0.2"/> <!-- faceoff dot upper-->
+     <circle cx="680" cy="630" r="4" stroke="red" fill="red" stroke-opacity="0.2" fill-opacity="0.2"/> <!-- faceoff dot lower-->
+     <circle cx="680" cy="220" r="150" stroke="red" stroke-width="3" fill="none" stroke-opacity="0.2"/> <!-- faceoff circle upper-->
+     <circle cx="680" cy="630" r="150" stroke="red" stroke-width="3" fill="none" stroke-opacity="0.2"/> <!-- faceoff circle lower-->
+     <circle cx="0" cy="425" r="4" stroke="red" stroke-width="4" fill="red" stroke-opacity="0.2" fill-opacity=".2"/> <!-- faceoff circle middle-->
+     <circle cx="0" cy="425" r="150" stroke="red" stroke-width="3" fill="none" stroke-opacity="0.2"/> <!-- faceoff circle middle-->
+
+     <!-- goal crease --> 
+     <path d="M 890, 465 
+                L 845, 465  
+                C 810 465, 810 385, 845 385
+                L 890, 385 
+                z" stroke="red" stroke-width="3" stroke-opacity="0.1" fill="blue" fill-opacity="0.1"/> 
+
+    <!-- goal -->
+    <path d="M 890, 395 
+                L 910, 395
+                C 930 395, 930 455, 910, 455 
+                L 890, 455 z" stroke="red" stroke-width="3" stroke-opacity="0.1" fill="red" fill-opacity="0.1"/> 
+
+    <circle cx="200" cy="220" r="4" stroke="red" fill="red" stroke-opacity="0.2" fill-opacity="0.2"/> <!-- faceoff dot upper-->
+    <circle cx="200" cy="630" r="4" stroke="red" fill="red" stroke-opacity="0.2" fill-opacity="0.2"/> <!-- faceoff dot lower-->
+     
+
+</svg>
