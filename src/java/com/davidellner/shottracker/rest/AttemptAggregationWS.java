@@ -30,8 +30,8 @@ import org.json.JSONObject;
  *
  * @author davidellner
  */
-@WebServlet(name = "attemptsummaryjson", urlPatterns = {"/rest/attemptsummaryjson"})
-public class AttemptSummaryWS extends HttpServlet {
+@WebServlet(name = "attemptaggregationjson", urlPatterns = {"/rest/attemptaggregationjson"})
+public class AttemptAggregationWS extends HttpServlet {
     
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -67,7 +67,7 @@ public class AttemptSummaryWS extends HttpServlet {
                 int miny = 10000;   //Integer.parseInt(request.getParameter("miny"));
                 int maxx = -10000;  //Integer.parseInt(request.getParameter("maxx"));
                 int maxy = -10000;  //Integer.parseInt(request.getParameter("maxy"));
-
+ 
                 //need error handling
 
                 String c = request.getParameter("coords");
@@ -91,25 +91,26 @@ public class AttemptSummaryWS extends HttpServlet {
                     if(y < miny) miny = y;
                     if(y > maxy) maxy = y;
                     
-                    
                     tx[(i / 2)] = x;
                     ty[(i / 2)] = y;
                     p = new Point(x, y);
-                    System.out.println(p);
+                    //System.out.println(p);
                     coordinates.add(p);
                     
                 }
+                //System.out.println("minx: " + minx + ", maxx: " + maxx + ", miny: " + miny + ", maxy: " + maxy);
                 
                 PolygonProcessor polygon = new PolygonProcessor((coordinates.size()-1), tx, ty);
-                attempts = DbAccess.getAttemptSummaryJSONByPlayerAndLocation(firstName, lastName, team, minx, miny, maxx, maxy, polygon);
+                //ResultSet rs = DbAccess.getAttemptSummaryResultSetByPlayerAndLocation(firstName, lastName, team, minx, miny, maxx, maxy);
+                //need to refactor this so we can close the db connection. db access shouldn't return a resultset
+                attempts = DbAccess.getAttemptAggregationJSONByPlayerAndLocation(firstName, lastName, team, minx, miny, maxx, maxy, polygon);
+                
            }
            
            StringWriter sw = new StringWriter();
            attempts.write(sw);
            out.println(sw);
-           } catch (JSONException ex) {
-            ErrorLogger.log(ex.toString());
-        } catch (SQLException ex) {
+           } catch (JSONException | SQLException ex) {
             ErrorLogger.log(ex.toString());
         }
         } 

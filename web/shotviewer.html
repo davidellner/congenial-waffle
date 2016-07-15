@@ -45,7 +45,7 @@ var base = d3.select("svg");
       ];
 
       /*
-
+      // We probably dont need to scale, since the image is just 1000, 850
       // We're passing in a function in d3.max to tell it what we're maxing (x value)
       var xScale = d3.scale.linear()
           .domain([0, d3.max(dataset, function (d) { return d.x + 10; })])
@@ -72,7 +72,7 @@ var base = d3.select("svg");
 
 
       // Adds X-Axis as a 'g' element
-      
+      var displaydata;
 
       svg.selectAll("circle")
           .data(dataset)
@@ -113,7 +113,7 @@ var base = d3.select("svg");
               var xdist = firstCoordinates[0] - coords[0];
               var ydist = firstCoordinates[1] - coords[1];
               if((Math.abs(xdist) < 11) && (Math.abs(ydist) < 11)){
-
+                //completed loop
                   svg.append("path")
                       .attr("stroke", "blue")
                       .attr("stroke-width", 2)
@@ -123,23 +123,37 @@ var base = d3.select("svg");
                   oldCoordinates = [0,0];
                   firstCoordinates = [-1, -1];
                   svg.selectAll("#temp").remove();
-                      
+                       
 
-                      svg.append("path")
-                      .attr("stroke", "red")
-                      .attr("id", "tmp")
-                      .attr("stroke-width", 2)
-                      .attr("fill", "red")
-                      .attr("fill-opacity", ".08")
-                      .attr("d", createPath(path));
+                      
+                       
+                       //console.log(createAggregationCall(path));
+                      d3.json(createAggregationCall(path), function(error, json) {
+
+                         if(error) return console.warn(error);
+
+                         displaydata = json[0];
+                         svg.append("path")
+                          .attr("stroke", "red")
+                          .attr("id", "tmp")
+                          .attr("stroke-width", 2)
+                          .attr("fill", "red")
+                          .attr("fill-opacity", ".08")
+                          .attr("d", createPath(path))
+                          .on("mouseover", mouseOverPath);
 
                        svg.selectAll("circle").remove(); 
                        svg.selectAll("text").remove();
-                       
-                       path = [];
+                         console.log(json);
+                         //console.log("hello");
+                         
+                     });
+                      //call webservice here
+
+                       //path = [];
 
                       //call webservice here
-                      console.log("shit on my dick")
+                      
               } else{
 
                     svg.append("path")
@@ -149,16 +163,11 @@ var base = d3.select("svg");
                       .attr("d", "M " + coords[0] + " "+ coords[1] + " L " + oldCoordinates[0] + " " + oldCoordinates[1] +"z");
                       oldCoordinates = [coords[0], coords[1]];
                       path.push(oldCoordinates);
-                      
-                      
-
-
-                      
+                                           
 
                 }
               }
-               
-              
+                    
               }
         )
       
@@ -194,7 +203,25 @@ var base = d3.select("svg");
                 y: function() { return d.y - 15; }
             })
             .text(function() {
-              return [d.x, d.y];  // Value of the text
+              return [scaleX(d.x), scaleY(d.y)];  // Value of the text
+            });
+          }
+
+      function mouseOverPath(d) {  // Add for path
+
+            // Use D3 to select element, change color and size
+            d3.select(this).attr({
+              fill: "orange"
+            });
+
+            // Specify where to put label of text
+            svg.append("text").attr({
+               id: "t" + 1 + "-" + 1,  // Create an id for text so we can select it later for removing on mouseout
+                x: function() { return 100; },
+                y: function() { return 100; }
+            })
+            .text(function() {
+              return JSON.stringify(displaydata);  // Value of the text
             });
           }
 
@@ -207,8 +234,54 @@ var base = d3.select("svg");
 
             // Select text by id and then remove
             d3.select("#t" + d.x + "-" + d.y).remove();  // Remove text location
-          }
+        }
 
+     function createAggregationCall(path){
+      //base url - replace shit...
+        var url = "/ShotTracker/rest/attemptaggregationjson?firstName=Sidney&lastName=Crosby&team=PIT&"
+
+        return url + createPathCoords(path);
+
+     }
+
+     function createPathCoords(path) {
+      // take in raw path data, 
+        var coordstext = "coords=\"";
+        var point;
+        for(var i = 0; i < path.length; i++ ){
+          //extract the point
+          point = path[i];
+          //concat the point
+          coordstext = coordstext + scaleX(point[0]) + "," + scaleY(point[1]) + ",";
+        }
+        //get last point to loop back
+        point = path[0];
+        // return the string
+        return coordstext + scaleX(point[0]) + "," + scaleY(point[1]) + "\"";
+     }
+
+    function scaleX (x){
+      return Math.round(x / 10);
+    }
+
+    function scaleY (y){
+      return Math.round(adjustY(y) / 10);
+    }
+    // return x adjusted for input into ws
+    function adjustY(y) {
+      var adjy = 0;
+      if(y < 425) {
+        // entering negative values
+        adjy = -425 + y //min y 
+      }
+      else {
+
+        adjy = y - 425; //positive values
+
+      }
+      return adjy;
+
+    }
   
 });
 

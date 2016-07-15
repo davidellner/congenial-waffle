@@ -10,9 +10,10 @@ and open the template in the editor.
     </head>
     <body>
         hello, world
-        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8">
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script>
              console.log("test");
-             d3.json("/rest/attemptsummaryjson?firstName=Sidney&lastName=Crosby&team=PIT&minx=30&maxx=70&miny=-20&maxy=40&coords=\"30,-20,30,40,70,40,70,-20,30,-20\"", function(error, json) {
+             d3.json("/ShotTracker/rest/attemptsummaryjson?firstName=Sidney&lastName=Crosby&team=PIT&minx=30&maxx=70&miny=-20&maxy=40&coords=\"30,-20,30,40,70,40,70,-20,30,-20\"", function(error, json) {
                  if(error) return console.warn(error);
                  
                  console.log(json);
